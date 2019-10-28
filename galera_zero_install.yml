@@ -1,0 +1,183 @@
+---
+- name: Install mysql
+  hosts: galera1, galera2, galera3
+  become: yes
+
+  tasks:
+
+  - name: Ping srvs
+    ping:
+
+  - name: deploy MariaDB.repo 1
+    copy: src=./files/MariaDB.repo dest=/etc/yum.repos.d/MariaDB.repo owner=root group=root mode=0644
+
+  - name: import RPR-GPG-KEY-MariaDB 2
+    rpm_key: key=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB state=present
+  
+  - name: install MariaDB-server MariaDB-client 3
+    yum: name={{ item }} state=present
+    with_items:
+      - MariaDB-server
+      - MariaDB-client
+
+  - name: start and enable mariadb 4
+    service: name=mariadb state=started enabled=yes
+
+  - name: set root pass for mysql 5
+    shell: mysql -u root -e 'set password = password("ASdf456+");'
+
+  - name: install rsync, policycoreutils-python 6
+    yum: name={{ item }} state=present
+    with_items:
+     - rsync
+     - policycoreutils-python
+
+  - name: start and enable firewalld 7
+    service: name=firewalld state=started enabled=yes
+  
+  - name: firewall-cmd --permanent --zone=public --add-port=3306/tcp 8 
+    firewalld: port=3306/tcp permanent=true state=enabled immediate=yes
+      
+  - name: firewall-cmd --permanent --zone=public --add-port=4567/tcp 9
+    firewalld: port=4567/tcp permanent=true state=enabled immediate=yes
+  
+  - name: firewall-cmd --permanent --zone=public --add-port=4568/tcp 10
+    firewalld: port=4568/tcp permanent=true state=enabled immediate=yes
+  
+  - name: firewall-cmd --permanent --zone=public --add-port=4444/tcp 11
+    firewalld: port=4444/tcp permanent=true state=enabled immediate=yes
+
+  - name: firewall-cmd --permanent --zone=public --add-port=4567/udp 12
+    firewalld: port=4567/udp permanent=true state=enabled immediate=yes
+
+  - name: firewall-cmd --permanent --zone=public --add-source=192.168.22.111/32 13
+    firewalld: source=192.168.22.111/32 permanent=true state=enabled immediate=yes
+
+  - name: firewall-cmd --permanent --zone=public --add-source=192.168.22.112/32 14
+    firewalld: source=192.168.22.112/32 permanent=true state=enabled immediate=yes
+
+  - name: firewall-cmd --permanent --zone=public --add-source=192.168.22.113/32 15
+    firewalld: source=192.168.22.113/32 permanent=true state=enabled immediate=yes
+
+- name: add config file for galera1 
+  hosts: galera1
+  become: yes
+
+  tasks:
+
+  - name: deploy galera.cnf 16
+    copy: src=./files/galera.cnf1 dest=/etc/my.cnf.d/galera.cnf owner=root group=root mode=0644
+
+
+- name: add config file for galera2 
+  hosts: galera2
+  become: yes
+
+  tasks:
+
+  - name: deploy galera.cnf 17
+    copy: src=./files/galera.cnf2 dest=/etc/my.cnf.d/galera.cnf owner=root group=root mode=0644
+
+
+- name: add config file for galera3
+  hosts: galera3
+  become: yes
+
+  tasks:
+
+  - name: deploy galera.cnf 18
+    copy: src=./files/galera.cnf3 dest=/etc/my.cnf.d/galera.cnf owner=root group=root mode=0644
+
+
+- name: allow access to the relevant ports by running the following commands on all three servers
+  hosts: galera1, galera2, galera3
+  become: yes
+
+  tasks:
+  - name: Allow mysql to listen on tcp ports   4567, 4568, 4444 19
+    seport:
+      ports: 4567, 4568, 4444
+      proto: tcp
+      setype: mysqld_port_t
+      state: present
+  
+  - name: Allow mysql to listen on udp port   4567 20
+    seport:
+      ports: 4567
+      proto: udp
+      setype: mysqld_port_t
+      state: present
+
+  - name: sets the MySQL SELinux domain to permissive mode temporarily 21
+    shell: semanage permissive -a mysqld_t
+
+  - name: stop mariadb 22
+    service: name=mariadb state=stopped 
+
+- name: of pass
+  hosts: galera1, galera2, galera3
+  become: yes
+
+  tasks:
+  - name:  off paswd for mysql 23
+    copy:  src=./files/my.cnf dest=/etc/my.cnf.d/my.cnf owner=root group=root mode=0600
+
+- name:    Config node1
+  hosts:   galera1
+  become: yes
+
+  tasks:  
+  - name:  bootstrap the cluster 24
+    shell: galera_new_cluster
+
+  - name:  Create a database and table for the specific purpose of logging SST events 25
+    shell: mysql -u root -e 'CREATE DATABASE selinux; CREATE TABLE selinux.selinux_policy (id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id)); INSERT INTO selinux.selinux_policy VALUES ();'
+
+
+
+- name: enable other nodes
+  hosts: galera2, galera3
+  become: yes
+  tasks:
+  - name: start and enable mariadb 26
+    service: name=mariadb state=started 
+  - name: generate IST events 27
+    shell: mysql -u root -e 'INSERT INTO selinux.selinux_policy VALUES ();'
+
+- name:    nastroika
+  hosts:   galera1, galera2, galera3
+  become: yes
+  tasks:
+  - name: generate IST events 28
+    shell: mysql -u root -e 'INSERT INTO selinux.selinux_policy VALUES ();'
+  - name: nastroika 29
+    shell: grep mysql /var/log/audit/audit.log | audit2allow -M Galera
+  - name: nastroika 30
+    shell: semodule -i Galera.pp
+  - name: nastroika 31
+    shell: semanage permissive -d mysqld_t
+
+
+- name:    PRESTART STOP node 3
+  hosts:   galera3
+  become: yes
+
+  tasks:
+  - name: stop mariadb 32
+    service: name=mariadb state=stopped 
+
+- name:    PRESTART STOP node2
+  hosts:   galera2
+  become: yes
+
+  tasks:
+  - name: stop mariadb 33
+    service: name=mariadb state=stopped 
+
+- name:    PRESTART STOP node1
+  hosts:   galera1
+  become: yes
+
+  tasks:
+  - name: stop mariadb 34
+    service: name=mariadb state=stopped 

@@ -1,0 +1,89 @@
+---
+- name:   setup swarm
+  hosts:  swarm
+  become: yes
+
+  tasks:
+  - name: ping
+    ping:
+  - name: epel
+    yum:
+      name:
+      - epel-release
+      - python-pip
+      - docker
+  # - name: pip docker install
+  #   pip: 
+  #     name: docker
+  - name: enable service
+    service:
+      name: docker
+      state: started
+      enabled: yes
+  - name: firewall setup 2376/tcp
+    firewalld:
+      port: 2376/tcp
+      permanent: true
+      state: enabled
+      immediate: yes
+  - name: firewall setup 2377/tcp
+    firewalld:
+      port: 2377/tcp
+      permanent: true
+      state: enabled
+      immediate: yes
+  - name: firewall setup  7946/tcp
+    firewalld:
+      port: 7946/tcp
+      permanent: true
+      state: enabled
+      immediate: yes
+  - name: firewall setup 7946/udp
+    firewalld:
+      port: 7946/udp
+      permanent: true
+      state: enabled
+      immediate: yes
+  - name: firewall setup 4789/udp
+    firewalld:
+      port: 4789/udp
+      permanent: true
+      state: enabled
+      immediate: yes
+
+- name: hostname change master
+  hosts: master
+  become: yes
+
+  tasks:
+  - name: hostname change to swarm-master
+    hostname:
+      name: swarm-master
+
+- name: hostname change node
+  hosts: node
+  become: yes
+
+  tasks:
+  - name: hostname change to swarm-node
+    hostname:
+      name: swarm-node
+
+- name:   reboot swarm
+  hosts:  swarm
+  become: yes
+
+  tasks:
+  - name: Reboot the server
+    tags: reboot
+    become: yes
+    become_user: root
+    shell: "sleep 5 && reboot"
+    async: 1
+    poll: 0
+  - name: Wait for the reboot to complete if there was a change.
+    wait_for_connection:
+      connect_timeout: 10
+      sleep: 5
+      delay: 5
+      timeout: 300

@@ -1,0 +1,27 @@
+[galera_cluster1]
+galera1 ansible_host=192.168.22.111
+galera2 ansible_host=192.168.22.112
+galera3 ansible_host=192.168.22.113
+
+[gogs_ws]
+ws1 ansible_host=192.168.22.101
+ws2 ansible_host=192.168.22.102
+ws3 ansible_host=192.168.22.103
+
+[nginx]
+nginx-ws ansible_host=192.168.22.104
+galera_nginx ansible_host=192.168.22.114
+
+[swarm]
+master ansible_host=192.168.22.31
+node ansible_host=192.168.22.32
+
+[masters]
+k8s-m   ansible_host=192.168.22.57
+
+[workers]
+k8s-n1  ansible_host=192.168.22.59
+k8s-n2  ansible_host=192.168.22.61
+
+[hypervisor]
+server ansible_host=192.168.22.88
