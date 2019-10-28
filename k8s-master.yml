@@ -2,13 +2,7 @@
   become: yes
   tasks:
     - name: initialize the cluster
-      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
-      args:
-        chdir: $HOME
-        creates: cluster_initialized.txt
-      register: initialize
-    - debug:
-        var: initialize
+      shell: kubeadm init --apiserver-advertise-address=192.168.22.57 --apiserver-cert-extra-sans=192.168.22.57 --node-name k8s-m --pod-network-cidr=172.16.0.0/16
 
     - name: create .kube directory
       become: yes
@@ -27,10 +21,8 @@
         remote_src: yes
         owner: root
 
-    - name: install Pod network
-      become: yes
-      become_user: root
-      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel-old.yaml >> pod_network_setup.txt
-      args:
-        chdir: $HOME
-        creates: pod_network_setup.txt
+    - name: install Calico Pod network
+      shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/rbac-kdd.yaml
+
+    - name: install Calico Pod network
+      shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/calico.yaml

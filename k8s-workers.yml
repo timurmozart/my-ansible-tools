@@ -17,9 +17,6 @@
   become: yes
   tasks:
 
-    # - name: TCP port 6443 on master is reachable from worker
-    #   wait_for: "host={{ hostvars['k8s-m']['ansible_default_ipv4']['address'] }} port=6443 timeout=1"
-
     - name: join cluster
       shell: "{{ hostvars['k8s-m'].join_command }} --ignore-preflight-errors all  >> node_joined.txt"
       args:
