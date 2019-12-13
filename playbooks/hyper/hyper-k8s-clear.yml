@@ -1,0 +1,60 @@
+---
+# - name:   ping k8s
+#   hosts:
+#     - masters
+#     - workers
+#   become: no
+
+#   tasks:
+#   # - name: ping
+#   #   ping:
+#   #   ignore_unreachable: yes
+#   #   ignore_errors: yes
+
+- hosts: server
+  become: yes
+  tasks:
+
+  - name: ping
+    ping:
+  - name: stop vm k8s-m-clear
+    virt:
+      name: k8s-m-clear
+      state: shutdown
+  - name: stop vm k8s-n1-clear
+    virt:
+      name: k8s-n1-clear
+      state: shutdown
+  - name: stop vm k8s-n2-clear
+    virt:
+      name: k8s-n2-clear
+      state: shutdown
+
+  - name: wait for shutdown
+    pause:
+      seconds: 3
+
+
+  - name: clone k8s-m from k8s-m-clear
+    shell: virt-clone --original k8s-m-clear --name k8s-m --auto-clone
+  - name: clone k8s-m from k8s-n1-clear
+    shell: virt-clone --original k8s-n1-clear --name k8s-n1 --auto-clone
+  - name: clone k8s-m from k8s-n2-clear
+    shell: virt-clone --original k8s-n2-clear --name k8s-n2 --auto-clone
+
+  - name: start vm k8s-m
+    virt:
+      name: k8s-m
+      state: running
+  - name: start vm k8s-n1
+    virt:
+      name: k8s-n1
+      state: running
+  - name: start vm k8s-n2
+    virt:
+      name: k8s-n2
+      state: running
+  - name: wait to start
+    pause:
+      seconds: 20
+

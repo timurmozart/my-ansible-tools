@@ -17,11 +17,18 @@ master ansible_host=192.168.22.31
 node ansible_host=192.168.22.32
 
 [masters]
-k8s-m   ansible_host=192.168.22.57
+k8s-m   ansible_host=192.168.22.101
 
 [workers]
-k8s-n1  ansible_host=192.168.22.59
-k8s-n2  ansible_host=192.168.22.61
+k8s-n1  ansible_host=192.168.22.102
+k8s-n2  ansible_host=192.168.22.103
 
 [hypervisor]
 server ansible_host=192.168.22.88
+
+[terraform]
+terra ansible_host=192.168.22.75
+
+[k8s-all:children]
+masters
+workers

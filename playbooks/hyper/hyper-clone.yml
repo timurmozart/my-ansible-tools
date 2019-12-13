@@ -1,0 +1,70 @@
+---
+- name: stop, clone, start clones
+  hosts: server
+  become: yes
+  tasks:
+
+  - name: ping
+    ping:
+
+  - name: stop vm k8s-m
+    virt:
+      name: k8s-m
+      state: shutdown
+  - name: stop vm k8s-n1
+    virt:
+      name: k8s-n1
+      state: shutdown
+  - name: stop vm k8s-n2
+    virt:
+      name: k8s-n2
+      state: shutdown
+
+  - name: wait for shutdown
+    pause:
+      seconds: 10
+  
+  - name: stop vm preinstall-k8s-m
+    virt:
+      name: preinstall-k8s-m
+      state: destroyed
+  - name: stop vm preinstall-k8s-n1
+    virt:
+      name: preinstall-k8s-n1
+      state: destroyed
+  - name: stop vm preinstall-k8s-n2
+    virt:
+      name: preinstall-k8s-n2
+      state: destroyed
+
+
+  - name: delete vm preinstall-k8s-m
+    shell: virsh undefine preinstall-k8s-m --remove-all-storage
+
+  - name: delete vm preinstall-k8s-n1
+    shell: virsh undefine preinstall-k8s-n1 --remove-all-storage
+
+  - name: delete vm preinstall-k8s-n2
+    shell: virsh undefine preinstall-k8s-n2 --remove-all-storage
+
+
+  - name: clone k8s-m from tst-k8s-m
+    shell: virt-clone --original k8s-m --name preinstall-k8s-m --auto-clone
+  - name: clone preinstall-k8s-n1 from tst-k8s-n1
+    shell: virt-clone --original k8s-n1 --name preinstall-k8s-n1 --auto-clone
+  - name: clone preinstall-k8s-n2 from tst-k8s-n2
+    shell: virt-clone --original k8s-n2 --name preinstall-k8s-n2 --auto-clone
+
+  - name: start vm preinstall-k8s-m
+    virt:
+      name: preinstall-k8s-m
+      state: running
+  - name: start vm preinstall-k8s-n1
+    virt:
+      name: preinstall-k8s-n1
+      state: running
+  - name: start vm preinstall-k8s-n2
+    virt:
+      name: preinstall-k8s-n2
+      state: running
+
