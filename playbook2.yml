@@ -1,10 +1,9 @@
 ---
-- name:    gogs restart
+- name:    ws ping
   hosts:   ws1, ws2, ws3
   become: yes
 
   tasks:
   - name:  ping
     ping:
-  - name: restart gogs service
-    service: name=gogs state=reloaded
+

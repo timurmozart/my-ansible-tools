@@ -1,0 +1,36 @@
+---
+- hosts: 
+    - workers
+    - masters
+  become: yes
+  tasks:
+  # - name: ping
+  #   ping:
+
+  # - name: shutdown
+  #   command: /sbin/shutdown -h now
+  #   ignore_errors: yes
+  # - name: leave cluster
+  #   shell: kubeadm reset -f
+  # - name: rm -rf node_joined.txt
+  #   shell: rm -rf node_joined.txt
+  # - name: systemctl disable firewalld
+  #   service:
+  #     name: firewalld
+  #     state: stopped
+  #     enabled: no
+  - name: Unconditionally reboot the machine with all defaults
+    reboot:
+
+
+# - hosts: 
+#     # - workers
+#     - masters
+#   become: yes
+#   tasks:
+#   - name: ping
+#     ping:
+#   - name: leave cluster
+#     shell: kubeadm reset -f
+#   - name: rm -rf cluster_initialized.txt
+#     shell: rm -rf cluster_initialized.txt

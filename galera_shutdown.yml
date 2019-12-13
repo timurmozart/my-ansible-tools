@@ -1,8 +1,0 @@
----
-- name: shutdownfalera
-  hosts: galera1, galera2, galera3
-  become: yes
-
-  tasks:
-  - name: shutdown
-    shell: shutdown -f now

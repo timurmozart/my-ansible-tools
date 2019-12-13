@@ -1,0 +1,28 @@
+- hosts: k8s-m
+  become: yes
+  tasks:
+    - name: initialize the cluster
+      shell: kubeadm init --apiserver-advertise-address=192.168.22.57 --apiserver-cert-extra-sans=192.168.22.57 --node-name k8s-m --pod-network-cidr=172.16.0.0/16
+
+    - name: create .kube directory
+      become: yes
+      become_user: root
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copy admin.conf to user's kube config
+      become: yes
+      become_user: root
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: $HOME/.kube/config
+        remote_src: yes
+        owner: root
+
+    - name: install Calico Pod network
+      shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/rbac-kdd.yaml
+
+    - name: install Calico Pod network
+      shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/calico.yaml

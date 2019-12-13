@@ -1,0 +1,10 @@
+---
+    - name: stop, clone, start clones
+      hosts: server
+      become: yes
+      tasks:
+
+      - name: ping
+        ping:
+      - name: clone clear in terraform
+        shell: virt-clone --original centos7.0-clear --name terraform --auto-clone

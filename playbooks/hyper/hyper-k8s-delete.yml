@@ -1,0 +1,27 @@
+---
+- hosts: server
+  become: yes
+  tasks:
+
+  - name: stop vm k8s-m
+    virt:
+      name: k8s-m
+      state: destroyed
+  - name: stop vm k8s-n1
+    virt:
+      name: k8s-n1
+      state: destroyed
+  - name: stop vm k8s-n2
+    virt:
+      name: k8s-n2
+      state: destroyed
+
+
+  - name: delete vm k8s-m
+    shell: virsh undefine k8s-m --remove-all-storage
+
+  - name: delete vm k8s-n1
+    shell: virsh undefine k8s-n1 --remove-all-storage
+
+  - name: delete vm k8s-n2
+    shell: virsh undefine k8s-n2 --remove-all-storage

@@ -1,0 +1,41 @@
+---
+- name:    install nginx
+  hosts:   gogs_ws
+  become: yes
+
+  tasks:
+  - name:  ping
+    ping:
+  - name: install epel-release, git, wget 1
+    yum: name={{ item }} state=present
+    with_items:
+      - epel-release
+      - git
+  - name: groupadd git 2 
+    group:
+      name: git
+
+  - name: Creates directory 3
+    file:
+      path: /opt/gogs
+      state: directory
+  - name: useradd 4 
+    shell: useradd -s /bin/nologin -g git -d /opt/gogs -M git
+  - name: unzip gogs 5
+    unarchive:
+      src: ./files/gogs.tar.gz
+      dest: /opt
+  - name: copy service file 6 
+    copy: 
+      src: ./files/gogs.service 
+      dest: /lib/systemd/system/gogs.service
+  - name: systemctl daemon-reload 7 
+    systemd:
+      daemon_reload: yes
+  - name: start gogs service 8 
+    service: name=gogs state=started enabled=yes
+
+  - name: firewall-cmd --permanent --zone=public --add-port=3000/tcp 9
+    firewalld: port=3000/tcp permanent=true state=enabled immediate=yes
+  - name: start gogs service 10
+    service: name=firewalld state=reloaded
