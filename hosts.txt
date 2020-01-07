@@ -32,3 +32,10 @@ terra ansible_host=192.168.22.75
 [k8s-all:children]
 masters
 workers
+
+[vagrant:children]
+lab
+
+[lab]
+rsyslog-0 ansible_host=192.168.10.10
+rsyslog-1 ansible_host=192.168.10.11
