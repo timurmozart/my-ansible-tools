@@ -1,6 +1,6 @@
 ---
 - name:    ws ping
-  hosts:   ws1, ws2, ws3
+  hosts:   lab
   become: yes
 
   tasks:

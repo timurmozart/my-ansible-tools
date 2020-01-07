@@ -37,5 +37,11 @@ workers
 lab
 
 [lab]
-rsyslog-0 ansible_host=192.168.10.10 
-rsyslog-1 ansible_host=192.168.10.11 
+rsyslog-0 ansible_host=192.168.10.10  
+rsyslog-1 ansible_host=192.168.10.11
+
+[lab:vars]
+ansible_user=vagrant
+ansible_ssh_pass=vagrant
+ansible_python_interpreter=/usr/bin/python3
+host_key_checking=false 

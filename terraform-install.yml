@@ -1,8 +1,0 @@
----
-    - name: terraform installer
-      hosts: terra
-      become: yes
-
-      tasks:
-      - name: ping
-        ping:
