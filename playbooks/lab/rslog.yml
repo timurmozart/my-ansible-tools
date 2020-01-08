@@ -9,4 +9,7 @@
 
 - name: config rsyslog-0
   hosts: rsyslog-0
-  
+  gather_facts: false
+  tasks:
+
+  - name: 
