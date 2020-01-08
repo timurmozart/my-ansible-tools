@@ -1,0 +1,12 @@
+---
+- hosts: lab
+  become: yes
+  gather_facts: false
+  tasks:
+
+  - name:
+    ping:
+
+- name: config rsyslog-0
+  hosts: rsyslog-0
+  

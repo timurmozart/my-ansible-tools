@@ -1,38 +1,3 @@
-[galera_cluster1]
-galera1 ansible_host=192.168.22.111
-galera2 ansible_host=192.168.22.112
-galera3 ansible_host=192.168.22.113
-
-[gogs_ws]
-ws1 ansible_host=192.168.22.101
-ws2 ansible_host=192.168.22.102
-ws3 ansible_host=192.168.22.103
-
-[nginx]
-nginx-ws ansible_host=192.168.22.104
-galera_nginx ansible_host=192.168.22.114
-
-[swarm]
-master ansible_host=192.168.22.31
-node ansible_host=192.168.22.32
-
-[masters]
-k8s-m   ansible_host=192.168.22.101
-
-[workers]
-k8s-n1  ansible_host=192.168.22.102
-k8s-n2  ansible_host=192.168.22.103
-
-[hypervisor]
-server ansible_host=192.168.22.88
-
-[terraform]
-terra ansible_host=192.168.22.75
-
-[k8s-all:children]
-masters
-workers
-
 [vagrant:children]
 lab
 
@@ -42,6 +7,6 @@ rsyslog-1 ansible_host=192.168.10.11
 
 [lab:vars]
 ansible_user=vagrant
-ansible_ssh_pass=vagrant
+ansible_pass=vagrant
 ansible_python_interpreter=/usr/bin/python3
 host_key_checking=false 
