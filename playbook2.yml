@@ -1,9 +1,0 @@
----
-- name:    ws ping
-  hosts:   lab
-  become: yes
-
-  tasks:
-  - name:  ping
-    ping:
-
