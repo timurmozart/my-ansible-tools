@@ -1,19 +1,21 @@
 ---
 - name: swarm init master
-  hosts: master
+  hosts: docker-swarm-head
   become: yes
 
   tasks:
 
-  - name:
-    shell: docker swarm leave --force
+  # - name:
+  #   shell: docker swarm leave --force
 
   - name: Init a new swarm with default parameters
     docker_swarm:
       state: present
+      advertise_addr: "{{ hostvars['docker-swarm-head'].ansible_eth1.ipv4.address }}"
   - name: Inspect swarm
     docker_swarm_info:
   - name: token
     shell: docker swarm join-token worker | grep token
-  #   register: Token
-  # - debug: msg={{Token.output}}
+    register: Token
+  - debug: 
+      var: Token.stdout

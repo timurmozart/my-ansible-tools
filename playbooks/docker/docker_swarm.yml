@@ -6,51 +6,53 @@
   tasks:
   - name: ping
     ping:
-  - name: epel
+  
+  - name: yum-utils
+    yum:
+      name:
+      - yum-utils
+  - name: device-mapper-persistent-data
+    yum:
+      name:
+      - device-mapper-persistent-data
+  - name: lvm2
+    yum:
+      name:
+      - lvm2
+  - name: epel-release
     yum:
       name:
       - epel-release
-      - python-pip
-      - docker
-  # - name: pip docker install
-  #   pip: 
-  #     name: docker
+  # - name: python-docker
+  #   yum:
+  #     name:
+  #     - python-docker
+  - name: Add Docker repo
+    shell: yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+
+  - name: install  docker-ce
+    yum:
+      name:
+      - docker-ce
+  - name: install  docker-ce-cli
+    yum:
+      name:
+      - docker-ce-cli
+  - name: install  containerd.io
+    yum:
+      name:
+      - containerd.io
+    
   - name: enable service
     service:
       name: docker
       state: started
       enabled: yes
-  - name: firewall setup 2376/tcp
-    firewalld:
-      port: 2376/tcp
-      permanent: true
-      state: enabled
-      immediate: yes
-  - name: firewall setup 2377/tcp
-    firewalld:
-      port: 2377/tcp
-      permanent: true
-      state: enabled
-      immediate: yes
-  - name: firewall setup  7946/tcp
-    firewalld:
-      port: 7946/tcp
-      permanent: true
-      state: enabled
-      immediate: yes
-  - name: firewall setup 7946/udp
-    firewalld:
-      port: 7946/udp
-      permanent: true
-      state: enabled
-      immediate: yes
-  - name: firewall setup 4789/udp
-    firewalld:
-      port: 4789/udp
-      permanent: true
-      state: enabled
-      immediate: yes
-
+  - name: add vagrant user to docker group
+    user:
+      name: vagrant
+      group: docker
+      
 - name: hostname change master
   hosts: master
   become: yes

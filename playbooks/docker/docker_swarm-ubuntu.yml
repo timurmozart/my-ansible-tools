@@ -1,0 +1,22 @@
+---
+- name:   setup swarm
+  hosts:  swarm
+  become: yes
+
+  tasks:
+  - name: ping
+    ping:
+  - name: install python 2.6
+    apt:
+      pkg:
+      - python2.7
+      - python-pip
+
+- name: init master
+  hosts: docker-swarm-head
+  become: yes
+
+  tasks:
+  - name: init master
+    docker_swarm:
+      state: present

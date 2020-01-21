@@ -1,13 +1,49 @@
 ---
+- name: get join_token
+  hosts: docker-swarm-head
+  become: yes
+  
+  tasks:
+  - name: Inspect swarm
+    docker_swarm:
+      state: inspect
+    register: swarm_info
+  - name: output
+    debug:
+      var: swarm_info.swarm_facts.JoinTokens.Worker
+
+
+
+
+
+
+
+
 - name: swarm node join
   hosts: node
   become: yes
 
   tasks:
 
+  - name: output hostvars['docker-swarm-head'].ansible_eth1.ipv4.address
+    debug:
+      msg: "{{  hostvars['docker-swarm-head'].ansible_eth1.ipv4.address }}"
+  - name: output token
+    debug:
+      msg: "{{ hostvars['docker-swarm-head']['swarm_info'].swarm_facts.JoinTokens.Worker }}"
+  - name: output node ip
+    debug:
+      msg: "{{ hostvars[inventory_hostname].ansible_eth1.ipv4.address }}"
   - name: Add nodes
     docker_swarm:
       state: join
-      advertise_addr: 192.168.22.32
-      join_token: SWMTKN-1-4h14n57lmyilpvq80g580yib3vn4bbgiz7bgs71y581iv3a4ck-65rfc8jeu9he81sl7ikl2l3ko
-      remote_addrs: [ '192.168.22.31:2377' ]
+      advertise_addr: "{{ hostvars[inventory_hostname].ansible_eth1.ipv4.address }}" 
+      join_token: "{{ hostvars['docker-swarm-head']['swarm_info'].swarm_facts.JoinTokens.Worker }}"
+      remote_addrs: [ "{{ hostvars['docker-swarm-head'].ansible_eth1.ipv4.address }}" ]
+
+
+
+# ---
+# - name: Add Workers to the Swarm
+#   shell: "docker swarm join --token {{ hostvars['swarm-manager']['worker_token']['stdout'] }} {{ hostvars['swarm-manager']['ansible_default_ipv4']['address'] }}:2377"
+#   tags: swarm

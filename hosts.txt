@@ -1,12 +1,25 @@
 [vagrant:children]
 lab
+swarm
 
 [lab]
-rsyslog-0 ansible_host=192.168.10.10  
-rsyslog-1 ansible_host=192.168.10.11
+rsyslog ansible_host=192.168.10.2
 
-[lab:vars]
+[swarm:children]
+master
+node
+
+
+[master]
+docker-swarm-head ansible_host=192.168.10.50
+
+[node]
+docker-swarm-node-1 ansible_host=192.168.10.51
+docker-swarm-node-2 ansible_host=192.168.10.52
+
+[swarm:vars]
+ansible_connection=ssh
 ansible_user=vagrant
-ansible_pass=vagrant
-ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_pass=vagrant
+#ansible_python_interpreter=/usr/bin/python3
 host_key_checking=false 

@@ -1,0 +1,9 @@
+---
+    - name:   setup swarm
+      hosts:  swarm
+      become: yes
+    
+      tasks:
+      - name: ping
+        ping:
+    
