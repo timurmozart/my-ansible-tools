@@ -1,33 +1,32 @@
 ---
-# - name: set hostname k8s-m
-#   hosts: k8s-m
-#   become: yes
-#   tasks:
-#     - name: change localhost to k8s-m
-#       hostname:
-#         name: k8s-m
+- name: set hostname k8s-m
+  hosts: k8s-m
+  become: yes
+  tasks:
+    - name: change localhost to k8s-m
+      hostname:
+        name: k8s-m
 
-# - name: set hostname 
-#   hosts: k8s-n1
-#   become: yes
-#   tasks:
-#     - name: change localhost to k8s-n1
-#       hostname:
-#         name: k8s-n1
+- name: set hostname 
+  hosts: k8s-n1
+  become: yes
+  tasks:
+    - name: change localhost to k8s-n1
+      hostname:
+        name: k8s-n1
 
-# - name: set hostname k8s-n2
-#   hosts: k8s-n2
-#   become: yes
-#   tasks:
-#     - name: change localhost to k8s-n2
-#       hostname:
-#         name: k8s-n2
+- name: set hostname k8s-n2
+  hosts: k8s-n2
+  become: yes
+  tasks:
+    - name: change localhost to k8s-n2
+      hostname:
+        name: k8s-n2
 
 
 - name:   setup k8s
   hosts:
-    - masters
-    - workers
+    - k8s
   become: yes
 
   tasks:
@@ -35,23 +34,23 @@
   - name: ping
     ping:
 
-  # - name: systemctl disable firewalld
-  #   service:
-  #     name: firewalld
-  #     state: stopped
-  #     enabled: no
+  - name: systemctl disable firewalld
+    service:
+      name: firewalld
+      state: stopped
+      enabled: no
 
-  # - name: swapoff -a
-  #   shell: swapoff -a
+  - name: swapoff -a
+    shell: swapoff -a
 
-  # - name: delete swap from fstab
-  #   shell: sed -i '${/swap/d;}' /etc/fstab
+  - name: delete swap from fstab
+    shell: sed -i '${/swap/d;}' /etc/fstab
 
-  # - name: adduser
-  #   user:
-  #     name: centos
-  #     createhome: yes
-  #     state: present
+  - name: adduser
+    user:
+      name: centos
+      createhome: yes
+      state: present
 
   - name: install Docker
     yum:
@@ -66,10 +65,10 @@
       enabled: yes
 
   - name: add hosts
-    shell: sed -i '$ a\ "{{ k8s-m }}"   k8s-m \n "{{ k8s-n1 }}"   k8s-n1 \n "{{ k8s-n2 }}"   k8s-n2' /etc/hosts
+    shell: sed -i '$ a\ 192.168.10.80   k8s-m \n 192.168.10.81   k8s-n1 \n 192.168.10.82   k8s-n2' /etc/hosts
 
-  - name: disable SELinux
-    command: setenforce 0
+  # - name: disable SELinux
+  #   command: setenforce 0
 
   - name: disable SELinux on reboot
     selinux:

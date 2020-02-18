@@ -42,8 +42,3 @@
       remote_addrs: [ "{{ hostvars['docker-swarm-head'].ansible_eth1.ipv4.address }}" ]
 
 
-
-# ---
-# - name: Add Workers to the Swarm
-#   shell: "docker swarm join --token {{ hostvars['swarm-manager']['worker_token']['stdout'] }} {{ hostvars['swarm-manager']['ansible_default_ipv4']['address'] }}:2377"
-#   tags: swarm

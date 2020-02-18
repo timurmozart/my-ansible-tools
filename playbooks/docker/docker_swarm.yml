@@ -42,7 +42,11 @@
     yum:
       name:
       - containerd.io
-    
+  - name: install python docker
+    yum:
+      name: 
+      - python-docker
+
   - name: enable service
     service:
       name: docker
@@ -52,7 +56,7 @@
     user:
       name: vagrant
       group: docker
-      
+
 - name: hostname change master
   hosts: master
   become: yes
