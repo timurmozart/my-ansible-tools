@@ -7,7 +7,7 @@
       hostname:
         name: k8s-m
 
-- name: set hostname 
+- name: set hostname
   hosts: k8s-n1
   become: yes
   tasks:
@@ -23,94 +23,117 @@
       hostname:
         name: k8s-n2
 
-
-- name:   setup k8s
+- name: setup k8s
   hosts:
     - k8s
   become: yes
 
   tasks:
+    - name: ping
+      ping:
 
-  - name: ping
-    ping:
+    - name: systemctl disable firewalld
+      service:
+        name: firewalld
+        state: stopped
+        enabled: no
 
-  - name: systemctl disable firewalld
-    service:
-      name: firewalld
-      state: stopped
-      enabled: no
+    - name: swapoff -a
+      shell: swapoff -a
 
-  - name: swapoff -a
-    shell: swapoff -a
+    - name: delete swap from fstab
+      shell: sed -i '${/swap/d;}' /etc/fstab
 
-  - name: delete swap from fstab
-    shell: sed -i '${/swap/d;}' /etc/fstab
+    - name: Install yum utils
+      yum:
+        name: yum-utils
+        state: present
 
-  - name: adduser
-    user:
-      name: centos
-      createhome: yes
-      state: present
+    - name: uninstall git
+      yum:
+        name: git
+        state: absent
 
-  - name: install Docker
-    yum:
-      name: docker
-      state: present
-      update_cache: true
+    - name: install git
+      yum:
+        name: https://centos7.iuscommunity.org/ius-release.rpm
+        state: present
 
-  - name: start Docker
-    service:
-      name: docker
-      state: started
-      enabled: yes
+    - name: install git
+      yum:
+        name: git2u-all
+        state: present
 
-  - name: add hosts
-    shell: sed -i '$ a\ 192.168.10.80   k8s-m \n 192.168.10.81   k8s-n1 \n 192.168.10.82   k8s-n2' /etc/hosts
+    - name: Add Docker repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docer-ce.repo
+      become: yes
 
-  # - name: disable SELinux
-  #   command: setenforce 0
+    - name: golang
+      yum:
+        name:
+          - golang
+        state: present
 
-  - name: disable SELinux on reboot
-    selinux:
-      state: disabled
+    - name: install Docker
+      yum:
+        name:
+          - docker-ce
+        state: present
 
-  - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
-    sysctl:
-      name: net.bridge.bridge-nf-call-ip6tables
-      value: 1
-      state: present
+    - name: start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
 
-  - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
-    sysctl:
-      name: net.bridge.bridge-nf-call-iptables
-      value: 1
-      state: present
+    - name: add hosts
+      shell: sed -i '$ a\ 192.168.10.80   k8s-m \n 192.168.10.81   k8s-n1 \n 192.168.10.82   k8s-n2' /etc/hosts
 
-  - name: add Kubernetes' YUM repository
-    yum_repository:
-      name: Kubernetes
-      description: Kubernetes YUM repository
-      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-      gpgcheck: yes
+    # - name: disable SELinux
+    #   command: setenforce 0
 
-  - name: install kubelet
-    yum:
-      name: kubelet-1.14.0
-      state: present
-      update_cache: true
+    - name: disable SELinux on reboot
+      selinux:
+        state: disabled
 
-  - name: install kubeadm
-    yum:
-      name: kubeadm-1.14.0
-      state: present
+    - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+      sysctl:
+        name: net.bridge.bridge-nf-call-ip6tables
+        value: 1
+        state: present
 
-  - name: start kubelet
-    service:
-      name: kubelet
-      enabled: yes
-      state: started
+    - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
+      sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: 1
+        state: present
 
+    - name: add Kubernetes' YUM repository
+      yum_repository:
+        name: Kubernetes
+        description: Kubernetes YUM repository
+        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        gpgcheck: yes
+
+    - name: install kubelet
+      yum:
+        name: kubelet
+        state: present
+        update_cache: true
+
+    - name: install kubeadm
+      yum:
+        name: kubeadm
+        state: present
+
+    - name: start kubelet
+      service:
+        name: kubelet
+        enabled: yes
+        state: started
 
 - name: master setup
   hosts: k8s-m
@@ -119,96 +142,119 @@
 
     - name: install kubectl
       yum:
-        name: kubectl-1.14.0
-        state: present
-        allow_downgrade: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 6443/tcp, 2379/tcp, 2380/tcp, 10250/tcp, 10251/tcp, 10252/tcp, 10255/tcp, 8472/udp
-#       firewalld: 
-#         port: 6443/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 2379/tcp
-#       firewalld: 
-#         port: 2379/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 2380/tcp
-#       firewalld: 
-#         port: 2380/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 10250/tcp
-#       firewalld: 
-#         port: 10250/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 10251/tcp
-#       firewalld: 
-#         port: 10251/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 10252/tcp
-#       firewalld: 
-#         port: 10252/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 10255/tcp
-#       firewalld: 
-#         port: 10255/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
-
-#     - name: firewall-cmd --permanent --zone=public --add-port= 8472/udp
-#       firewalld: 
-#         port: 8472/udp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
+        name: kubectl
+        state: latest
 
 
+    - name: kubebuilder dir create
+      file:
+        path: /usr/bin/kubebuilder
+        state: directory
 
-# - name: workers setup
-#   hosts: workers
-#   become: yes
-#   tasks:
-#     - name: firewall-cmd --permanent --zone=public --add-port= 10250/tcp
-#       firewalld: 
-#         port: 10250/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
+    - name: download kubebuilder
+      unarchive:
+        src: https://github.com/kubernetes-sigs/kubebuilder/releases/download/v2.2.0/kubebuilder_2.2.0_linux_amd64.tar.gz
+        dest: /usr/bin/kubebuilder
+        remote_src: yes
 
-#     - name: firewall-cmd --permanent --zone=public --add-port= 10255/tcp
-#       firewalld: 
-#         port: 10255/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
+    - name: helm download
+      unarchive:
+        src: https://get.helm.sh/helm-v3.1.0-linux-amd64.tar.gz
+        dest: /tmp/
+        remote_src: yes
 
-#     - name: firewall-cmd --permanent --zone=public --add-port= 8472/udp
-#       firewalld: 
-#         port: 8472/udp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
+    - name: Copy helm to usr bin
+      copy:
+        src: /tmp/linux-amd64/helm
+        dest: /usr/bin/helm
+        remote_src: yes
+        mode: +x
+        follow: yes
 
-#     - name: firewall-cmd --permanent --zone=public --add-port= 30000-32767/tcp
-#       firewalld: 
-#         port: 30000-32767/tcp
-#         permanent: true 
-#         state: enabled 
-#         immediate: yes
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 6443/tcp, 2379/tcp, 2380/tcp, 10250/tcp, 10251/tcp, 10252/tcp, 10255/tcp, 8472/udp
+# #       firewalld:
+# #         port: 6443/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 2379/tcp
+# #       firewalld:
+# #         port: 2379/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 2380/tcp
+# #       firewalld:
+# #         port: 2380/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 10250/tcp
+# #       firewalld:
+# #         port: 10250/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 10251/tcp
+# #       firewalld:
+# #         port: 10251/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 10252/tcp
+# #       firewalld:
+# #         port: 10252/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 10255/tcp
+# #       firewalld:
+# #         port: 10255/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 8472/udp
+# #       firewalld:
+# #         port: 8472/udp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# # - name: workers setup
+# #   hosts: workers
+# #   become: yes
+# #   tasks:
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 10250/tcp
+# #       firewalld:
+# #         port: 10250/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 10255/tcp
+# #       firewalld:
+# #         port: 10255/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 8472/udp
+# #       firewalld:
+# #         port: 8472/udp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes
+
+# #     - name: firewall-cmd --permanent --zone=public --add-port= 30000-32767/tcp
+# #       firewalld:
+# #         port: 30000-32767/tcp
+# #         permanent: true
+# #         state: enabled
+# #         immediate: yes

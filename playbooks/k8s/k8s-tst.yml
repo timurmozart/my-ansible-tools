@@ -23,7 +23,7 @@
 
 
 - hosts: 
-    # - workers
+    - workers
     - masters
   become: yes
   tasks:

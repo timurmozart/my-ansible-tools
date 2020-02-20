@@ -21,8 +21,26 @@
         remote_src: yes
         owner: root
 
-    - name: install Calico Pod network
-      shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/rbac-kdd.yaml
+# # calico network
+#     - name: install Calico Pod network
+#       shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/rbac-kdd.yaml
 
-    - name: install Calico Pod network
-      shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/calico.yaml
+#     - name: install Calico Pod network
+#       shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/calico.yaml
+
+# flannel network
+    - name: install flannel Pod network
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-legacy.yml
+
+    - name: install flannel Pod network
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+
+
+# kubeadm join 192.168.10.80:6443 --token qgvnkn.wf7jwifhwlp4k81d \
+#     --discovery-token-ca-cert-hash sha256:ab3beb43771f6c0bd51854847a73ab7e489994cf7ee7124b00f3722910b349e5 \
+#     --node-ip=192.168.10.81
+
+
+# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-legacy.yml
+# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+# error: unable to recognize "": no matches for kind "" in version ""
