@@ -23,6 +23,14 @@
       hostname:
         name: k8s-n2
 
+- name: set hostname k8s-n3
+  hosts: k8s-n3
+  become: yes
+  tasks:
+    - name: change localhost to k8s-n3
+      hostname:
+        name: k8s-n3
+
 - name: setup k8s
   hosts:
     - k8s
@@ -89,7 +97,7 @@
         enabled: yes
 
     - name: add hosts
-      shell: sed -i '$ a\ 192.168.10.80   k8s-m \n 192.168.10.81   k8s-n1 \n 192.168.10.82   k8s-n2' /etc/hosts
+      shell: sed -i '$ a\ 192.168.10.80   k8s-m \n 192.168.10.81   k8s-n1 \n 192.168.10.82   k8s-n2 \n 192.168.10.83   k8s-n3' /etc/hosts
 
     # - name: disable SELinux
     #   command: setenforce 0
@@ -143,33 +151,33 @@
     - name: install kubectl
       yum:
         name: kubectl
-        state: latest
+        state: present
 
 
-    - name: kubebuilder dir create
-      file:
-        path: /usr/bin/kubebuilder
-        state: directory
+    # - name: kubebuilder dir create
+      # file:
+      #   path: /usr/bin/kubebuilder
+      #   state: directory
 
-    - name: download kubebuilder
-      unarchive:
-        src: https://github.com/kubernetes-sigs/kubebuilder/releases/download/v2.2.0/kubebuilder_2.2.0_linux_amd64.tar.gz
-        dest: /usr/bin/kubebuilder
-        remote_src: yes
+    # - name: download kubebuilder
+    #   unarchive:
+    #     src: https://github.com/kubernetes-sigs/kubebuilder/releases/download/v2.2.0/kubebuilder_2.2.0_linux_amd64.tar.gz
+    #     dest: /usr/bin/kubebuilder
+    #     remote_src: yes
 
-    - name: helm download
-      unarchive:
-        src: https://get.helm.sh/helm-v3.1.0-linux-amd64.tar.gz
-        dest: /tmp/
-        remote_src: yes
+    # - name: helm download
+    #   unarchive:
+    #     src: https://get.helm.sh/helm-v3.1.0-linux-amd64.tar.gz
+    #     dest: /tmp/
+    #     remote_src: yes
 
-    - name: Copy helm to usr bin
-      copy:
-        src: /tmp/linux-amd64/helm
-        dest: /usr/bin/helm
-        remote_src: yes
-        mode: +x
-        follow: yes
+    # - name: Copy helm to usr bin
+    #   copy:
+    #     src: /tmp/linux-amd64/helm
+    #     dest: /usr/bin/helm
+    #     remote_src: yes
+    #     mode: +x
+    #     follow: yes
 
 # #     - name: firewall-cmd --permanent --zone=public --add-port= 6443/tcp, 2379/tcp, 2380/tcp, 10250/tcp, 10251/tcp, 10252/tcp, 10255/tcp, 8472/udp
 # #       firewalld:

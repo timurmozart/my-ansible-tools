@@ -5,4 +5,87 @@
   tasks:
     - name: ping
       ping:
+
+    - name: download kubebuilder
+      unarchive:
+        src: https://github.com/kubernetes-sigs/kubebuilder/releases/download/v2.2.0/kubebuilder_2.2.0_linux_amd64.tar.gz
+        dest: /tmp/
+        remote_src: yes
+
+    - name: Create a /usr/local/kubebuilder/bin/ if it does not exist
+      file:
+        path: /usr/local/kubebuilder/bin/
+        state: directory
+        mode: '0755'
+
+    - name: Copy etcd from foo to bar
+      copy: 
+        remote_src: True 
+        src: /tmp/kubebuilder_2.2.0_linux_amd64/bin/etcd
+        dest: /usr/local/kubebuilder/bin/
+        mode: +x
+
+    - name: Copy kubectl from foo to bar
+      copy: 
+        remote_src: True 
+        src: /tmp/kubebuilder_2.2.0_linux_amd64/bin/kubectl
+        dest: /usr/local/kubebuilder/bin/
+        mode: +x
+
+    - name: Copy kube-apiserver from foo to bar
+      copy: 
+        remote_src: True 
+        src: /tmp/kubebuilder_2.2.0_linux_amd64/bin/kube-apiserver
+        dest: /usr/local/kubebuilder/bin/
+        mode: +x
+        
+    - name: Copy files from foo to bar
+      copy: 
+        remote_src: True 
+        src: /tmp/kubebuilder_2.2.0_linux_amd64/bin/kubebuilder
+        dest: /usr/local/kubebuilder/bin/
+        mode: +x
+        
+    - name: Remove old files foo
+      file: 
+        path: /tmp/kubebuilder_2.2.0_linux_amd64
+        state: absent
+
+    - name: kustomize install download 
+      get_url: 
+        url: https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh
+        dest: /tmp
+        mode: +x
+
+    - name: kustomize install run
+      shell: cd /tmp && /tmp/install_kustomize.sh
     
+    - name: Copy kustomize from tmp to /usr/bin/
+      copy: 
+        remote_src: True 
+        src: /tmp/kustomize
+        dest: /usr/bin/
+        mode: +x
+    
+    - name: Remove old files kustomize
+      file: 
+        path: /tmp/kustomize
+        state: absent
+
+    - name: golangci-lint install   
+      shell: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/bin v1.23.6
+
+
+    - name: helm download
+      unarchive:
+        src: https://get.helm.sh/helm-v3.1.0-linux-amd64.tar.gz
+        dest: /tmp/
+        remote_src: yes
+
+    - name: Copy helm to usr bin
+      copy:
+        src: /tmp/linux-amd64/helm
+        dest: /usr/bin/helm
+        remote_src: yes
+        mode: +x
+        follow: yes

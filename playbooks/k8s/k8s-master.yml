@@ -21,19 +21,16 @@
         remote_src: yes
         owner: root
 
-# # calico network
-#     - name: install Calico Pod network
-#       shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/rbac-kdd.yaml
+    - name: taint master node
+      shell: kubectl taint nodes k8s-m node-role.kubernetes.io/master-
 
-#     - name: install Calico Pod network
-#       shell: kubectl apply -f https://raw.githubusercontent.com/ecomm-integration-ballerina/kubernetes-cluster/master/calico/calico.yaml
+  # calico network
+    - name: install Calico Pod network
+      shell: kubectl apply -f https://docs.projectcalico.org/v3.9/manifests/calico.yaml
 
-# flannel network
-    - name: install flannel Pod network
-      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-legacy.yml
-
-    - name: install flannel Pod network
-      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+# # flannel network
+#     - name: install flannel Pod network
+#       shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
 
 # kubeadm join 192.168.10.80:6443 --token qgvnkn.wf7jwifhwlp4k81d \

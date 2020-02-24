@@ -6,3 +6,27 @@ upstream default {
     server 192.168.22.102:3000
     server 192.168.22.103:3000
 }
+
+export GO111MODULE="on"
+export PATH=$PATH:/root/go/bin
+go mod download
+go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.4
+go install golang.org/x/tools/cmd/goimports
+go install sigs.k8s.io/kustomize/kustomize/v3
+
+os=$(go env GOOS)
+arch=$(go env GOARCH)
+curl -L https://go.kubebuilder.io/dl/2.2.0/${os}/${arch} | tar -xz -C /tmp/
+sudo mv /tmp/kubebuilder_2.2.0_${os}_${arch} /usr/local/kubebuilder
+export PATH=$PATH:/usr/local/kubebuilder/bin
+
+
+
+docker save -o /mnt/host_machine/varnish-controller.tar varnish-controller:0.22.1-dev
+docker save -o /mnt/host_machine/varnish-metrics-exporter.tar varnish-metrics-exporter:0.22.1-dev
+docker save -o /mnt/host_machine/varnish.tar varnish:0.22.1-dev
+docker save -o /mnt/host_machine/varnish-operator.tar varnish-operator:0.22.1-dev
+docker load -i  /mnt/host_machine/varnish-controller.tar
+docker load -i  /mnt/host_machine/varnish-metrics-exporter.tar
+docker load -i  /mnt/host_machine/varnish.tar
+docker load -i  /mnt/host_machine/varnish-operator.tar
