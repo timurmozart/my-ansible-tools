@@ -1,10 +1,17 @@
+---
+- name: save docker img
+  hosts: k8s-m
+  become: yes
+  gather_facts: false
+  tasks:
+    - name:
+      ping:
+    - name: 
+      shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
 
 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+# kubectl edit -n kubernetes-dashboard   service/kubernetes-dashboard
 
+# kubectl get secret -A
 
-kubectl edit -n kubernetes-dashboard   service/kubernetes-dashboard
-
-kubectl get secret -A
-
-kubectl -n kube-system describe secret admin-user-...
+# kubectl -n kube-system describe secret admin-user-...

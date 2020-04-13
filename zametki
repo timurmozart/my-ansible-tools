@@ -1,5 +1,5 @@
-
-GRANT ALL PRIVILEGES ON *.* TO 'gogs'@'%' IDENTIFIED BY 'gogs_pass';
+CREATE USER 'gogs'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON gogs.* TO 'gogs'@'%' IDENTIFIED BY 'password';
 
 upstream default {
     server 192.168.22.101:3000;
@@ -10,7 +10,7 @@ upstream default {
 export GO111MODULE="on"
 export PATH=$PATH:/root/go/bin
 go mod download
-go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.4
+go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.4
 go install golang.org/x/tools/cmd/goimports
 go install sigs.k8s.io/kustomize/kustomize/v3
 
@@ -20,6 +20,7 @@ curl -L https://go.kubebuilder.io/dl/2.2.0/${os}/${arch} | tar -xz -C /tmp/
 sudo mv /tmp/kubebuilder_2.2.0_${os}_${arch} /usr/local/kubebuilder
 export PATH=$PATH:/usr/local/kubebuilder/bin
 
+kubectl create deployment nginx-backend --image nginx -n varnish-test
 
 
 docker save -o /mnt/host_machine/varnish-controller.tar varnish-controller:0.22.1-dev

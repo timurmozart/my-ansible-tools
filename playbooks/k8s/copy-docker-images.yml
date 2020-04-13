@@ -1,0 +1,36 @@
+---
+- name: save docker img
+  hosts: k8s-m
+  become: yes
+  gather_facts: false
+  tasks:
+    - name:
+      ping:
+    - name: copy img
+      shell: docker save -o /mnt/host_machine/varnish-controller.tar varnish-controller:0.22.1-dev
+    - name: copy img
+      shell: docker save -o /mnt/host_machine/varnish-metrics-exporter.tar varnish-metrics-exporter:0.22.1-dev
+    - name: copy img
+      shell: docker save -o /mnt/host_machine/varnish.tar varnish:0.22.1-dev
+    - name: copy img
+      shell: docker save -o /mnt/host_machine/varnish-operator.tar varnish-operator:0.22.1-dev
+
+
+- name: load docker img 
+  hosts: workers
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: del old
+      shell: docker image rm $(docker image ls -aq) &>/dev/null
+      ignore_errors: true
+    - name:
+      ping:
+    - name: load img
+      shell: docker load -i  /mnt/host_machine/varnish-controller.tar
+    - name: load img
+      shell: docker load -i  /mnt/host_machine/varnish-metrics-exporter.tar
+    - name: load img
+      shell: docker load -i  /mnt/host_machine/varnish.tar
+    - name: load img
+      shell: docker load -i  /mnt/host_machine/varnish-operator.tar

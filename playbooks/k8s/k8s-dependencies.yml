@@ -23,13 +23,13 @@
       hostname:
         name: k8s-n2
 
-- name: set hostname k8s-n3
-  hosts: k8s-n3
-  become: yes
-  tasks:
-    - name: change localhost to k8s-n3
-      hostname:
-        name: k8s-n3
+# - name: set hostname k8s-n3
+#   hosts: k8s-n3
+#   become: yes
+#   tasks:
+#     - name: change localhost to k8s-n3
+#       hostname:
+#         name: k8s-n3
 
 - name: setup k8s
   hosts:

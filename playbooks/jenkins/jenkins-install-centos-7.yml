@@ -1,0 +1,19 @@
+---
+- name: Jenkins install
+  hosts: jenkins-host
+  become: yes
+  tasks:
+    - name: hostname set to jenkins-host
+      hostname:
+        name: jenkins-host
+    - name: Install yum utils
+      yum:
+        name: epel-release
+        state: present
+    - name: Install a list of packages
+      yum:
+        name:
+          - java-1.8.0-openjdk-devel
+          - jenkins
+          - git
+        state: present

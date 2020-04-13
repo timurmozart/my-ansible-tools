@@ -1,0 +1,30 @@
+---
+- name: mysql install on gogs
+  hosts: gogs_ws
+  become: yes
+
+  tasks:
+    - name: deploy MariaDB.repo 1
+      copy: 
+        src: /Users/triaz/Documents/GitHub/my-ansible-tools/files/MariaDB.repo
+        dest: /etc/yum.repos.d/MariaDB.repo 
+        owner: root 
+        group: root 
+        mode: 0644
+
+    - name: disable repo
+      yum: 
+        disablerepo: "*"
+        enablerepo: "mariadb"
+
+    - name: install MariaDB-server MariaDB-client 3
+      yum: 
+        name:
+          - MariaDB-server
+        state: present
+
+    - name: start and enable mariadb 4
+      service:
+        name: mariadb
+        state: started
+        enabled: yes

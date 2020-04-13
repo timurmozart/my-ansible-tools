@@ -2,14 +2,18 @@
 lab
 swarm
 k8s
+gogs
 
 [lab]
 rsyslog ansible_host=192.168.10.2
+varnish-operator ansible_host=192.168.10.79
 
 [swarm:children]
 master
 node
 
+[gogs]
+gogs_ws ansible_host=192.168.10.40
 
 [master]
 docker-swarm-head ansible_host=192.168.10.50

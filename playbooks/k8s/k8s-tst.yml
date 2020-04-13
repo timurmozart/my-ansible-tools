@@ -36,10 +36,10 @@
     - name: rm -rf cluster_initialized.txt
       shell: rm -rf /root/node_joined.txt
 
-    - name: net-tools install
-      yum: 
-        name: net-tools
-        state: latest
+    # - name: net-tools install
+    #   yum: 
+    #     name: net-tools
+    #     state: latest
 
 
     - name:

@@ -17,6 +17,7 @@ Group=git
 WorkingDirectory=/opt/gogs
 ExecStart=/opt/gogs/gogs web
 Restart=always
+RestartSec=15
 Environment=USER=git HOME=/opt/gogs
 
 # Some distributions may not support these hardening directives. If you cannot start the service due
